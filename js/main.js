@@ -1,4 +1,6 @@
 function main(){
+    let entities = [];
+
     let canvas = new Canvas({
         cvID: "boidsCanvas",
         width: 1000,
@@ -6,10 +8,14 @@ function main(){
     });
     let update = new Loop({
         drawfps: 60,
-        updatefps: 60,
+        updatefps: 512,
         canvas: canvas.ctx,
-        draw: draw,
-    })
+        entities: entities,
+        draw: drawFunction,
+        update: updateFunction
+    });
+
+
 }
 
 function Canvas(args){
@@ -25,20 +31,31 @@ function Canvas(args){
     this.ctx.height = args.height;
 }
 
-function draw(canvas,loop){
-    loop.framecount += 1 //this should later go into the update loop
+function drawFunction(canvas, entities){
+    // loop.framecount += 1 //this should later go into the update loop
 
     canvas.fillStyle = "#EEEEEEEE";
     canvas.fillRect(0,0,canvas.width,canvas.height);
 
-    canvas.strokestyle = "black"
-    canvas.beginPath();
-    canvas.arc(500+(100*Math.sin(0.01*loop.framecount)), 400+(100*Math.cos(0.01*loop.framecount)), 40, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
+    for (const entity of entities){
+        entity.draw(canvas);
+    }
+
+
 }
 
-function update(){
+function updateFunction(entities){
+    if (entities.length < 512){
+
+        entities.push(
+            new Entity({
+                x: getRandomInt(1000), 
+                y: getRandomInt(800), 
+                rot: 0}
+                )
+            )
+
+    }
 
 }
 
@@ -47,9 +64,36 @@ function Loop(args){
     this.canvas = args.canvas || null;
     this.drawfps = args.drawfps || 60;
     this.updatefps = args.updatefps || 60;
-    this.update = args.updateFunction;
-    this.draw = args.drawFunction;
+    // this.update = args.updateFunction;
+    // this.draw = args.drawFunction;
+    this.entities = args.entities;
 
-    this.updateLoop = setInterval(args.update, 1000/this.updatefps);
-    this.drawLoop = setInterval(()=>{args.draw(this.canvas, this)}, 1000/this.fps);
+    this.updateLoop = setInterval(()=>{args.update(this.entities)}, 1000/this.updatefps);
+    this.drawLoop = setInterval(()=>{args.draw(this.canvas,this.entities ,this)}, 1000/this.fps);
+}
+
+class Entity{
+    constructor(args){
+        this.x = args.x;
+        this.y = args.y;
+        this.rot = args.rot;
+    }
+    
+    draw(cv){
+        cv.strokestyle = "black"
+        cv.beginPath();
+        cv.arc(this.x, this.y, 1.5, 0, 2 * Math.PI);
+        cv.closePath();
+        cv.stroke();
+    }
+
+    setXY(x,y){
+        this.x = x;
+        this.y = y;
+    }
+
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
 }
