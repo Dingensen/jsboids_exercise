@@ -44,17 +44,21 @@ function drawFunction(canvas, entities){
 
 }
 
-function updateFunction(entities){
-    if (entities.length < 512){
+function updateFunction(canvas,entities){
+    if (entities.length < 32){
 
         entities.push(
-            new Entity({
+            new Boid({
                 x: getRandomInt(1000), 
                 y: getRandomInt(800), 
                 rot: 0}
                 )
             )
-
+    }
+    for (entity of entities) {
+        entity.vector.x += getRandomInt(3)-1;
+        entity.vector.y += getRandomInt(3)-1;
+        entity.updatePosition(canvas);
     }
 
 }
@@ -68,7 +72,7 @@ function Loop(args){
     // this.draw = args.drawFunction;
     this.entities = args.entities;
 
-    this.updateLoop = setInterval(()=>{args.update(this.entities)}, 1000/this.updatefps);
+    this.updateLoop = setInterval(()=>{args.update(this.canvas,this.entities)}, 1000/this.updatefps);
     this.drawLoop = setInterval(()=>{args.draw(this.canvas,this.entities ,this)}, 1000/this.fps);
 }
 
@@ -90,6 +94,10 @@ class Entity{
     setXY(x,y){
         this.x = x;
         this.y = y;
+    }
+
+    getCoords(){
+        return({x:this.x,y:this.y})
     }
 
 }
