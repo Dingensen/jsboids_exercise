@@ -1,12 +1,12 @@
 class Boid extends Entity {
     constructor(args){
         super(args)
-        this.vector = args.vector || {x:0,y:0};
+        this.vector = new Victor.fromObject(args.vector || {x:10,y:0})
 
         this.geom = [
-            {x:0    ,y:6  },
-            {x:2  ,y:-2 },
-            {x:-2 ,y:-2 },
+            new Victor.fromObject({x:12    ,y:0  }),
+            new Victor.fromObject({x:-4  ,y:4 }),
+            new Victor.fromObject({x:-4 ,y:-4 }),
 
         ]
     }
@@ -14,11 +14,17 @@ class Boid extends Entity {
         cv.strokeStyle = "black"
         cv.fillStyle = "black"
         cv.beginPath();
-        
-        for(let i = 0; i<this.geom.length; i++){
+
+        for(const vert of this.geom){
+            let angle = this.vector.horizontalAngle();
+            let rotatedVert = new Victor.fromObject(vert).rotate(angle);
+
             cv.lineTo(
-                this.x+this.geom[i].x,
-                this.y+this.geom[i].y
+                this.x+ rotatedVert.x,
+                this.y+ rotatedVert.y
+
+                // this.x+ vert.x,
+                // this.y+ vert.y
             )
         }
         

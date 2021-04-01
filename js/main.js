@@ -8,7 +8,7 @@ function main(){
     });
     let update = new Loop({
         drawfps: 60,
-        updatefps: 512,
+        updatefps: 60,
         canvas: canvas.ctx,
         entities: entities,
         draw: drawFunction,
@@ -34,7 +34,7 @@ function Canvas(args){
 function drawFunction(canvas, entities){
     // loop.framecount += 1 //this should later go into the update loop
 
-    canvas.fillStyle = "#EEEEEEEE";
+    canvas.fillStyle = "#FFFFFF";
     canvas.fillRect(0,0,canvas.width,canvas.height);
 
     for (const entity of entities){
@@ -45,7 +45,7 @@ function drawFunction(canvas, entities){
 }
 
 function updateFunction(canvas,entities){
-    if (entities.length < 32){
+    if (entities.length < 128){
 
         entities.push(
             new Boid({
@@ -56,9 +56,14 @@ function updateFunction(canvas,entities){
             )
     }
     for (entity of entities) {
-        entity.vector.x += getRandomInt(3)-1;
-        entity.vector.y += getRandomInt(3)-1;
+        entity.vector.rotateDeg(getRandomInt(3)-1);
+
+
+        // entity.vector.x += (getRandomInt(3)-1)/100;
+        // entity.vector.y += (getRandomInt(3)-1)/100;
         entity.updatePosition(canvas);
+
+        // console.log(entity.vector)
     }
 
 }
@@ -73,7 +78,7 @@ function Loop(args){
     this.entities = args.entities;
 
     this.updateLoop = setInterval(()=>{args.update(this.canvas,this.entities)}, 1000/this.updatefps);
-    this.drawLoop = setInterval(()=>{args.draw(this.canvas,this.entities ,this)}, 1000/this.fps);
+    this.drawLoop = setInterval(()=>{args.draw(this.canvas,this.entities ,this)}, 1000/this.drawfps);
 }
 
 class Entity{
