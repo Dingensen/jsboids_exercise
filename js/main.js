@@ -1,4 +1,6 @@
 function main(){
+
+
     let entities = [];
 
     let canvas = new Canvas({
@@ -15,6 +17,10 @@ function main(){
         update: updateFunction
     });
 
+    const DOMcanvas = document.querySelector('canvas')
+    DOMcanvas.addEventListener('mousedown',(e)=>{
+        getCursorPosition(DOMcanvas, e, entities)
+    })
 
 }
 
@@ -29,6 +35,7 @@ function Canvas(args){
     this.ctx = this.canvas.getContext("2d");
     this.ctx.width = args.width;
     this.ctx.height = args.height;
+
 }
 
 function drawFunction(canvas, entities){
@@ -45,26 +52,36 @@ function drawFunction(canvas, entities){
 }
 
 function updateFunction(canvas,entities){
-    if (entities.length < 128){
+    if (entities.length < 64){
 
         entities.push(
             new Boid({
                 x: getRandomInt(1000), 
                 y: getRandomInt(800), 
-                rot: 0}
-                )
-            )
+                rot: 0,
+                id: entities.length,
+            })
+        )
     }
     for (entity of entities) {
-        entity.vector.rotateDeg(getRandomInt(3)-1);
+        // entity.vector.rotateDeg((getRandomInt(3)-1)*5);
+
+        // let factor = Math.random()+0.5;
+        // let factorVec = new Victor(factor, factor);
+        // entity.vector.add(factorVec);
 
 
         // entity.vector.x += (getRandomInt(3)-1)/100;
         // entity.vector.y += (getRandomInt(3)-1)/100;
-        entity.updatePosition(canvas);
+        entity.updatePosition(canvas,entities);
 
         // console.log(entity.vector)
+        // if(entity.getNeighbours(entities).length>1){
+        //     console.log("peep")
+        // }
     }
+
+    // console.log(entities[0].getNeighbours(entities).length)
 
 }
 
@@ -109,4 +126,20 @@ class Entity{
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getCursorPosition(canvas, event, entities) {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+    console.log("x: " + x + " y: " + y)
+
+    entities.push(
+        new Boid({
+            x: x, 
+            y: y, 
+            rot: 0,
+            id: entities.length,
+        })
+    )
 }
